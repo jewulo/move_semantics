@@ -7,20 +7,14 @@ using namespace std;
 #include <iostream>
 #include <vector>
 
+#include "chapter_1.h"
 #include "chapter_2.h"
 #include "chapter_3.h"
+#include "chapter_4.h"
 
-std::vector<std::string> create_and_insert()
+void chapter_1_run()
 {
-    std::vector<std::string> coll;      // create vector of strings
-    coll.reserve(3);                    // reserve memory for 3 elements
-    std::string s = "data";             // create string object
-
-    coll.push_back(s);                  // insert string object
-    coll.push_back(s+s);                // insert temporary string (move is implicit in C++20 for temporaries)
-    coll.push_back(std::move(s));       // move string object
-
-    return coll;                        // return vector of strings
+    chapter_1::sec_1_1_1::run();
 }
 
 void chapter_2_run()
@@ -39,15 +33,42 @@ void chapter_3_run()
 {
     chapter_3::sec_3_1::run();
     chapter_3::sec_3_1::run_2();
+    chapter_3::sec_3_2::run();
+    chapter_3::sec_3_2::run_2();
+    chapter_3::sec_3_3_2::run();
+    chapter_3::sec_3_3_3::run();
+    chapter_3::sec_3_3_4::run();
+    chapter_3::sec_3_3_5::run();
+    chapter_3::sec_3_3_5b::run();
+    chapter_3::sec_3_3_6::run();
+    chapter_3::sec_3_3_7::run();
+}
+
+void chapter_4_run()
+{
+    //chapter_4::sec_4_1::run();
+    //chapter_4::sec_4_1_1::run();
+    //chapter_4::sec_4_1_1::run2();
+    //chapter_4::sec_4_2::run();
+    //chapter_4::sec_4_3_1::run();
+    //chapter_4::sec_4_3_1b::run();
+    //chapter_4::sec_4_3_2::run();
+    //chapter_4::sec_4_3_3::run();
+    //chapter_4::sec_4_3_3::run_2();
+    //chapter_4::sec_4_3_3b::run();
+    //chapter_4::sec_4_3_3c::run();
+    chapter_4::sec_4_3_4::run();
+    chapter_4::sec_4_3_6::run();
+    chapter_4::sec_4_3_6::run2();
+    chapter_4::sec_4_3_6::run3();
 }
 
 int main()
 {
-    std::vector<std::string> v;         // create empty vector of strings
-    v = create_and_insert();            // assign returned vector of strings (move is implicit in C++20)
-
+    chapter_1_run();
     //chapter_2_run();
-    chapter_3_run();
+    //chapter_3_run();
+    chapter_4_run();
 
     cin.get();
 }

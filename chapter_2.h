@@ -23,7 +23,6 @@ namespace chapter_2
 				// std::string&& r1{ s };						// ERROR, you cannot copy or initialise rvalues directly
 				std::string&& r2{ std::move(s) };				// OK
 				std::string&& r3{ return_string_by_value() };	// OK, extends lifetime of return value
-
 			}
 			{
 				std::string s1{ "hello" };
@@ -200,6 +199,7 @@ namespace chapter_2
 		void run()
 		{
 			const std::string s1{ "data" };
+			// Warning C26478: Don't use std::move on constant variables
 			foo(std::move(s1));				// calls foo(const std::string&& arg)
 			foo(get_value());				// calls foo(const std::string&& arg)
 
