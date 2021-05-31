@@ -449,6 +449,7 @@ namespace chapter_4
 	}
 
 	// Should We Now Always Pass by Value and Move?
+	// .... it depends.
 	namespace sec_4_3_6
 	{
 		class Person1 {
@@ -542,5 +543,9 @@ namespace chapter_4
 
 	}
 
+	// Move Semantics In class Hierarchies
+	namespace sec_4_4
+	{
 
+	}
 }

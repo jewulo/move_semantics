@@ -522,36 +522,36 @@ namespace chapter_3
 			// NO destructor
 		};
 
-		class invoice_t
+		class Invoice
 		{
 		private:
 			std::string	m_id;
 			Customer	m_cust;
 		public:
 			// using defaults
-			invoice_t(std::string id, Customer p)
+			Invoice(std::string id, Customer p)
 				: m_id{id}, m_cust{p}
 			{}
 			// the generated move constructor will move m_id string but copy the
-			//  Person cust because move semantics is disabled for Person
+			// Customer cust because move semantics is disabled for Customer
 		};
 
 		void run()
 		{
-			invoice_t inv{ std::string{"inv01" }, Customer{ "Tina", "Fox" } };
-			invoice_t inv2{ std::move(inv) };	// OK, moves id, copies invoice
+			Invoice inv{ std::string{"inv01" }, Customer{ "Tina", "Fox" } };
+			Invoice inv2{ std::move(inv) };	// OK, moves m_id, copies m_cust
 		}
 	}
 
 	// Exact Rules for Generated Special Member Functions
 	namespace sec_3_3_8
 	{
-		class Mytype {};
-		class base_t {};
-		class my_class_t : public base_t
+		class MyType {};
+		class Base {};
+		class MyClass : public Base
 		{
 		private:
-			Mytype value;
+			MyType value;
 		};
 
 	}
