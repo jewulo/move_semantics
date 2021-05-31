@@ -144,8 +144,10 @@
     <ClCompile Include="move_semantics.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="chapter_1.h" />
     <ClInclude Include="chapter_2.h" />
     <ClInclude Include="chapter_3.h" />
+    <ClInclude Include="chapter_4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

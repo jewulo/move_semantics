@@ -11,20 +11,20 @@ namespace chapter_4
 	// Avoid Objects with Names: Favour Values
 	namespace sec_4_1
 	{		
-		struct mytype_t {
+		struct Mytype {
 			int m_v;
 			std::string m_n;
 		};
 
-		void foo(mytype_t v) {};
+		void foo(Mytype v) {};
 		void run(void)
 		{
-			mytype_t x{ 42,"hello" };
+			Mytype x{ 42,"hello" };
 			// if x is not used afterwards then it is a wasted declaration that
 			// disables move semantic optimizations
 			foo(x);
 			// prefer rvalues to lvalues: this automatically uses move semantics
-			foo(mytype_t{ 42, "hello" });
+			foo(Mytype{ 42, "hello" });
 			// if a named variable must be used for clarity then you can use std::move
 			// if you are sure that the value will not be required later
 			foo(std::move(x));
@@ -110,141 +110,141 @@ namespace chapter_4
 	// Initialisze Members The Classical Way
 	namespace sec_4_3_1
 	{
-		class person_t {
+		class Person {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person_t(const std::string& f, const std::string& l)
+			Person(const std::string& f, const std::string& l)
 				:m_first{ f }, m_last{ l }
 			{}
 		};
 		void run(void)
 		{
-			person_t p{ "Ben", "Cook" };
+			Person p{ "Ben", "Cook" };
 		}
 	}
 
 	// Using non-const lvalue References
 	namespace sec_4_3_1b
 	{
-		class person_t {
+		class Person {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person_t(std::string& f, std::string& l)
+			Person(std::string& f, std::string& l)
 				:m_first{ f }, m_last{ l }
 			{}
 		};
 		void run(void)
 		{
 			// this will not compile, you cannot bind temporaries to non-const lvalues
-			//person_t p{ "Ben", "Cook" };
+			//Person p{ "Ben", "Cook" };
 		}
 	}
 
 	// Initialisze Members via Moved Parameters Passed by Value
 	namespace sec_4_3_2
 	{
-		class person_t {
+		class Person {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person_t(std::string f, std::string l)
+			Person(std::string f, std::string l)
 				:m_first{ std::move(f) }, m_last{ std::move(l) }
 			{}
 		};
 		void run(void)
 		{
-			person_t p1{ "Ben", "Cook" };
+			Person p1{ "Ben", "Cook" };
 
 			std::string name1{ "Jane" };
 			std::string name2{ "White" };
-			person_t p2{ name1, name2 };	// OK, copy names into parameters and moved into members
+			Person p2{ name1, name2 };	// OK, copy names into parameters and moved into members
 		}
 	}
 
 	// Initialisze Members via rvalue References
 	namespace sec_4_3_3
 	{
-		class person_t {
+		class Person {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person_t(std::string&& f, std::string&& l)
+			Person(std::string&& f, std::string&& l)
 				:m_first{ std::move(f) }, m_last{ std::move(l) }
 			{}
 		};
 		void run(void)
 		{
-			person_t p1{ "Ben", "Cook" }; // pass temporaries
+			Person p1{ "Ben", "Cook" }; // pass temporaries
 
 			std::string name1{ "Jane" };
 			std::string name2{ "White" };
-			person_t p2{ std::move(name1), std::move(name2) };	// OK, move names into parameters and moved into members
+			Person p2{ std::move(name1), std::move(name2) };	// OK, move names into parameters and moved into members
 		}
 		// Overloading For rvalue and lvalue References
 		void run_2(void)
 		{
 			// passing temporaries works OK for rvalue References....
-			person_t p1{ "Ben", "Cook" };
+			Person p1{ "Ben", "Cook" };
 
 			std::string name1{ "Jane" };
 			std::string name2{ "White" };
 			// ....but, we cannot pass named objects into rvalue reference parameters
 			// because we cannot bind lvalues to rvalue references 
-			// person_t p2{ name1, name2 };
+			// Person p2{ name1, name2 };
 		}
 	}
 
 	// Overload for Rvalue and Lvalue References
 	namespace sec_4_3_3b
 	{
-		class person_t {
+		class Person {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person_t(const std::string& f, const std::string& l)
+			Person(const std::string& f, const std::string& l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(const std::string& f, std::string&& l)
+			Person(const std::string& f, std::string&& l)
 				:m_first{ f }, m_last{ std::move(l) }
 			{}
 
-			person_t(std::string&& f, const std::string& l)
+			Person(std::string&& f, const std::string& l)
 				:m_first{ std::move(f) }, m_last{ l }
 			{}
 
-			person_t(std::string&& f, std::string&& l)
+			Person(std::string&& f, std::string&& l)
 				:m_first{ std::move(f) }, m_last{ std::move(l) }
 			{}
 		};
 		void run(void)
 		{
 			// passing temporaries works OK for rvalue References....
-			person_t p1{ "Ben", "Cook" }; // pass temporaries
+			Person p1{ "Ben", "Cook" }; // pass temporaries
 
 			std::string name1{ "Jane" };
 			std::string name2{ "White" };
 			// OK, move names into parameters and moved into members
-			person_t p2{ std::move(name1), std::move(name2) };
+			Person p2{ std::move(name1), std::move(name2) };
 
 			std::string name3{ "Jane" };
 			std::string name4{ "White" };
 			// OK we can pass named objects into lvalue reference parameters
-			person_t p3{ name1, name2 };
+			Person p3{ name1, name2 };
 
 			// copy via char*
 			char str1[] = "Jane";
 			char str2[] = "White";
-			person_t p4{ str1, str2 };
+			Person p4{ str1, str2 };
 
-			person_t p5{ "Jane", "White" };
+			Person p5{ "Jane", "White" };
 		}
 	}
 	// Overloading Even for string literals
@@ -253,74 +253,74 @@ namespace chapter_4
 	// in this case 2 parameters for 3 is 3^2 = 9
 	namespace sec_4_3_3c
 	{
-		class person_t {
+		class Person {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person_t(const std::string& f, const std::string& l)
+			Person(const std::string& f, const std::string& l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(const std::string& f, std::string&& l)
+			Person(const std::string& f, std::string&& l)
 				:m_first{ f }, m_last{ std::move(l) }
 			{}
 
-			person_t(std::string&& f, const std::string& l)
+			Person(std::string&& f, const std::string& l)
 				:m_first{ std::move(f) }, m_last{ l }
 			{}
 
-			person_t(std::string&& f, std::string&& l)
+			Person(std::string&& f, std::string&& l)
 				:m_first{ std::move(f) }, m_last{ std::move(l) }
 			{}
 
-			person_t(const char* f, const char* l)
+			Person(const char* f, const char* l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(const char* f, const std::string& l)
+			Person(const char* f, const std::string& l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(const char* f, std::string&& l)
+			Person(const char* f, std::string&& l)
 				:m_first{ f }, m_last{ std::move(l) }
 			{}
 
-			person_t(const std::string& f, const char* l)
+			Person(const std::string& f, const char* l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(std::string&& f, const char* l)
+			Person(std::string&& f, const char* l)
 				:m_first{ std::move(f) }, m_last{ l }
 			{}
 		};
 		void run(void)
 		{
 			// passing temporaries works OK for rvalue References....
-			person_t p1{ "Ben", "Cook" }; // pass temporaries
+			Person p1{ "Ben", "Cook" }; // pass temporaries
 
 			std::string name1{ "Jane" };
 			std::string name2{ "White" };
 			// OK, move names into parameters and moved into members
-			person_t p2{ std::move(name1), std::move(name2) };
+			Person p2{ std::move(name1), std::move(name2) };
 
 			std::string name3{ "Jane" };
 			std::string name4{ "White" };
 			// OK we can pass named objects into lvalue reference parameters
-			person_t p3{ name1, name2 };
+			Person p3{ name1, name2 };
 
 			// copy via char*
 			char str1[] = "Jane";
 			char str2[] = "White";
-			person_t p4{ str1, str2 };
+			Person p4{ str1, str2 };
 
-			person_t p5{ "Jane", "White" };
+			Person p5{ "Jane", "White" };
 
 			// pass temporary strings
-			person_t p6{ std::string { "Jane" }, std::string {"White"} };
+			Person p6{ std::string { "Jane" }, std::string {"White"} };
 			// pass temporary strings using operator ""s
 			// operator ""s is defined in std::literals as std::literals::s			
-			person_t p7{ "Jane"s, "White"s };
+			Person p7{ "Jane"s, "White"s };
 			
 		}
 	}
@@ -328,48 +328,48 @@ namespace chapter_4
 	// Compare the Different Approaches
 	namespace sec_4_3_4
 	{
-		class person_t {
+		class Person {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person_t(const std::string& f, const std::string& l)
+			Person(const std::string& f, const std::string& l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(const std::string& f, std::string&& l)
+			Person(const std::string& f, std::string&& l)
 				:m_first{ f }, m_last{ std::move(l) }
 			{}
 
-			person_t(std::string&& f, const std::string& l)
+			Person(std::string&& f, const std::string& l)
 				:m_first{ std::move(f) }, m_last{ l }
 			{}
 
-			person_t(std::string&& f, std::string&& l)
+			Person(std::string&& f, std::string&& l)
 				:m_first{ std::move(f) }, m_last{ std::move(l) }
 			{}
 
-			person_t(const char* f, const char* l)
+			Person(const char* f, const char* l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(const char* f, const std::string& l)
+			Person(const char* f, const std::string& l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(const char* f, std::string&& l)
+			Person(const char* f, std::string&& l)
 				:m_first{ f }, m_last{ std::move(l) }
 			{}
 
-			person_t(const std::string& f, const char* l)
+			Person(const std::string& f, const char* l)
 				:m_first{ f }, m_last{ l }
 			{}
 
-			person_t(std::string&& f, const char* l)
+			Person(std::string&& f, const char* l)
 				:m_first{ std::move(f) }, m_last{ l }
 			{}
 		};
-		// measure num initializations of whatever is currently defined as person_t
+		// measure num initializations of whatever is currently defined as Person
 		std::chrono::nanoseconds measure(int num)
 		{
 			std::chrono::nanoseconds total_dur{ 0 };
@@ -378,9 +378,9 @@ namespace chapter_4
 				std::string lname = "a lastname a bit too long for SSO";
 				// measure how long it takes to create 3 persons in different ways:
 				auto t0 = std::chrono::steady_clock::now();
-					person_t p1 { "a firstname a bit too long for SSO","a lastname a bit too long for SSO" };
-					person_t p2 { fname, lname };
-					person_t p3 { std::move(fname), std::move(lname) };
+					Person p1 { "a firstname a bit too long for SSO","a lastname a bit too long for SSO" };
+					Person p2 { fname, lname };
+					Person p3 { std::move(fname), std::move(lname) };
 				auto t1 = std::chrono::steady_clock::now();
 				total_dur += t1 - t0;
 			}
@@ -407,7 +407,7 @@ namespace chapter_4
 		}
 
 		// expensive members that will not benefit from move
-		class person2_t {
+		class Person2 {
 		private:
 			std::string m_name;
 			std::array<double, 10000> values;	// move can't optimize here
@@ -420,29 +420,29 @@ namespace chapter_4
 	{
 		// Rule for initialising member vectors or lists
 		// pass parameter by value and move into member
-		class person1_t {
+		class Person1 {
 		private:
 			std::string m_name;
 			std::vector<std::string> m_values;
 		public:
-			person1_t(std::string n, std::vector<std::string> v)
+			Person1(std::string n, std::vector<std::string> v)
 				: m_name{ std::move(n) }, m_values{ std::move(v) }
 			{}
 		};
 
 		// Rule for initialising member arrays
 		// overload on lvalue-ref and rvalue-ref
-		class person2_t {
+		class Person2 {
 		private:
 			std::string m_name;
 			std::array<std::string, 1000> m_values;
 		public:
 			// copy array if passed by lvalue-ref
-			person2_t(std::string n, const std::array<std::string, 1000>& arr)
+			Person2(std::string n, const std::array<std::string, 1000>& arr)
 				: m_name{ std::move(n) }, m_values{ arr }
 			{}
 			// move array if passed by rvalue-ref
-			person2_t(std::string n, std::array<std::string, 1000>&& arr)
+			Person2(std::string n, std::array<std::string, 1000>&& arr)
 				: m_name{ std::move(n) }, m_values{ std::move(arr) }
 			{}
 		};
@@ -451,12 +451,12 @@ namespace chapter_4
 	// Should We Now Always Pass by Value and Move?
 	namespace sec_4_3_6
 	{
-		class person1_t {
+		class Person1 {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person1_t(std::string f, std::string l)
+			Person1(std::string f, std::string l)
 				:m_first{ std::move(f) }, m_last{ std::move(l) }
 			{}
 
@@ -468,7 +468,7 @@ namespace chapter_4
 		};
 		void run(void)
 		{
-			person1_t p1{ "Ben", "Cook" };
+			Person1 p1{ "Ben", "Cook" };
 
 			std::string name1{ "Ann" };
 			std::string name2{ "Constantin Alexander" };
@@ -478,12 +478,12 @@ namespace chapter_4
 			p1.set_first_name(name1);
 			p1.set_first_name(name2);
 		}
-		class person2_t {
+		class Person2 {
 		private:
 			std::string m_first;
 			std::string m_last;
 		public:
-			person2_t(std::string f, std::string l)
+			Person2(std::string f, std::string l)
 				:m_first{ std::move(f) }, m_last{ std::move(l) }
 			{}
 
@@ -501,7 +501,7 @@ namespace chapter_4
 		};
 		void run2(void)
 		{
-			person2_t p1{ "Ben", "Cook" };
+			Person2 p1{ "Ben", "Cook" };
 
 			p1.set_first_name("Constantin Alexander");	// would allocate enough memory
 			p1.set_first_name("Ann");					// would allocate enough memory
@@ -510,13 +510,13 @@ namespace chapter_4
 
 		// initialization of members is not the only application of "take by value and move"
 		// adding values to a member container would be another application
-		class person3_t {
+		class Person3 {
 		private:
 			std::string m_name;
 			std::vector<std::string> m_values;
 		public:
-			person3_t() = default;
-			person3_t(std::string n, std::vector<std::string> v)
+			Person3() = default;
+			Person3(std::string n, std::vector<std::string> v)
 				: m_name{ std::move(n) }, m_values{ std::move(v) }
 			{}
 			// better pass by value and move to insert a new element
@@ -532,11 +532,12 @@ namespace chapter_4
 		};
 		void run3(void)
 		{
-			person3_t p;
+			Person3 p;
 
 			p.set_name("Constantin Alexander");
 			p.add_value("Ann");
 			p.add_value(std::string{ "Constantina Alexandra" });
+			p.add_value("Annie Bloom"s); // use operator ""s to convert char* to std::string
 		}
 
 	}
