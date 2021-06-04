@@ -247,6 +247,7 @@ namespace chapter_4
 			Person p5{ "Jane", "White" };
 		}
 	}
+	
 	// Overloading Even for string literals
 	// The more parameters you have the more overloading
 	// is required to cover all 3 parameter combination reference types (const lref, rref, value)
@@ -546,6 +547,277 @@ namespace chapter_4
 	// Move Semantics In class Hierarchies
 	namespace sec_4_4
 	{
+		// Implementing a Polymorphic Base Class
+		namespace sec_4_4_1
+		{
+			namespace without_members
+			{
+				// default delete call the right destructor but it disables default move semantics
+				// in this case it doesn't matter because we have no members
+				class GeoObj {
+				public:
+					virtual void draw() const = 0;	// pure virtual function (introducing the API)
+					virtual ~GeoObj() = default;	// lets delete call the right destructor
+				};
+			}
+			namespace with_members
+			{
 
+				// default delete call the right destructor but it disables default move semantics
+				// in this case it does matter because we have a member m_name
+				class GeoObj {
+				protected:
+					std::string m_name;				// name of the geometric object
+				public:
+					virtual void draw() const = 0;	// pure virtual function (introducing the API)
+					virtual ~GeoObj() = default;	// default destructor disables move semantics for member m_name
+				};
+			}
+			namespace slicing_problem
+			{
+				class GeoObj {
+				protected:
+					std::string m_name;				// name of the geometric object
+				public:
+					GeoObj()
+						: m_name{}
+					{}
+					GeoObj(std::string n)
+						: m_name{ std::move(n) }
+					{}
+					virtual void draw() const = 0;	// pure virtual function (introducing the API)
+					virtual ~GeoObj() = default;	// default destructor disables move semantics for member m_name
+				};
+
+				class Circle : public GeoObj {
+				public:
+					Circle(std::string n)
+						: GeoObj(n)
+					{}
+					virtual void draw() const {}
+				};
+
+				void run()
+				{
+					Circle c1{ std::string{ "c1" } }, c2{ std::string{ "c2" } };
+					GeoObj& geo_ref{ c1 };
+					geo_ref = c2;	// OOPS: uses default GeoObj::operator=() and assigns no Cirle members
+				}
+			}
+			namespace solve_slicing_problem
+			{
+				class GeoObj {
+				protected:
+					std::string m_name;				// name of the geometric object
+					GeoObj(std::string n)
+						: m_name{std::move(n)}
+					{}
+				public:
+					virtual void draw() const = 0;	// pure virtual function (introducing the API)
+					virtual ~GeoObj() = default;	// default destructor disables move semantics for member m_name
+				protected:
+					// enable copy and move semantics (callable only for derived classes)
+					GeoObj(const GeoObj&) = default;
+					GeoObj(GeoObj&&) = default;
+					// disable assignment operators (due to problem of slicing)
+					GeoObj& operator= (const GeoObj&) = delete;
+					GeoObj& operator= (GeoObj&&) = delete;
+				};
+				class Circle : public GeoObj {
+				public:
+					Circle(std::string n)
+						:GeoObj(n)
+					{}
+					virtual void draw() const {}
+				};
+
+				void run()
+				{
+					Circle c1{ std::string{"c1"} }, c2{ std::string{"c2"} };
+					GeoObj& geo_ref{ c1 };
+					//geo_ref = c2;				// OOPS: avoids GeoObj::operator=() and slicing
+					//geo_ref = std::move(c2);	// OOPS: avoids GeoObj::operator=() and slicing
+				}
+			}
+		}
+		// Implementing a Polymorphic Derive Class
+		namespace sec_4_4_2a // disables move semantics via default destructor
+		{
+			class GeoObj {
+			protected:
+				std::string m_name;				// name of the geometric object
+				GeoObj(std::string n)
+					: m_name{ std::move(n) }
+				{}
+			public:
+				virtual void draw() const = 0;	// pure virtual function (introducing the API)
+				virtual ~GeoObj() = default;	// default destructor disables move semantics for member m_name
+			protected:
+				// enable copy and move semantics (callable only for derived classes)
+				GeoObj(const GeoObj&) = default;
+				GeoObj(GeoObj&&) = default;
+				// disable assignment operators (due to problem of slicing)
+				GeoObj& operator= (const GeoObj&) = delete;
+				GeoObj& operator= (GeoObj&&) = delete;
+			};
+
+			// http://www.cppmove.com/code/poly/coord.hpp.html
+			class Coord {
+			private:
+				int m_x{ 0 };
+				int m_y{ 0 };
+			public:
+				// default constructor
+				Coord() = default;
+				Coord(int xarg, int yarg)
+					: m_x{xarg}, m_y{yarg}
+				{}
+				Coord(const Coord&) = default;
+				Coord(Coord&&) = default;
+				Coord& operator= (const Coord&) = default;
+				Coord& operator= (Coord&&) = default;
+
+				friend Coord operator+ (Coord c1, Coord c2) { // plus
+					return Coord{c1.m_x+c2.m_x, c1.m_y + c2.m_y };
+				}
+				friend Coord operator- (Coord c1, Coord c2) { // diff
+					return Coord{ c1.m_x - c2.m_x, c1.m_y - c2.m_y };
+				}
+				Coord operator- () const { // negate
+					return Coord{-m_x, -m_y};
+				}
+				void operator+= (Coord c) { // +=
+					*this = *this + c;	// or: m_x+=c.m_x; m_y+=c.m_y
+				}
+				void operator-= (Coord c) { // -=
+					operator+=(-c);	// or as above
+				}
+				int getX() const {
+					return m_x;
+				}
+				int getY() const {
+					return m_y;
+				}
+				friend std::ostream& operator<<(std::ostream& strm, Coord c) {
+					return strm << '(' << c.m_x << ',' << c.m_y << ')';
+				}
+			};
+			// http://www.cppmove.com/code/poly/polygon.hpp.html
+			class Polygon : public GeoObj {
+			protected:
+				std::vector<Coord> m_points;
+			public:
+				Polygon(std::string s, std::initializer_list<Coord> pl= {})
+					: GeoObj{ std::move(s) }, m_points { std::move(pl) }
+				{}
+				virtual void draw() const override {
+					std::cout << "polygon '" << m_name << "' over";
+					for (auto& p : m_points) {
+						std::cout << " " << p;
+					}
+					std::cout << "\n";
+				}
+				virtual ~Polygon() = default; // disables move semantics
+			};
+			void run()
+			{
+				Polygon p0{ "Poly1", {Coord{1,1}, Coord{1,9}, Coord{9,9}, Coord{9,1}} };
+				Polygon p1{p0};					// copy
+				Polygon p2{ std::move(p0) };	// move
+
+				p0.draw();
+				p1.draw();
+				p2.draw();
+			}
+		}
+		namespace sec_4_4_2b
+		{
+			class GeoObj {
+			protected:
+				std::string m_name;				// name of the geometric object
+				GeoObj(std::string n)
+					: m_name{ std::move(n) }
+				{}
+			public:
+				virtual void draw() const = 0;	// pure virtual function (introducing the API)
+				virtual ~GeoObj() = default;	// default destructor disables move semantics for member m_name
+			protected:
+				// enable copy and move semantics (callable only for derived classes)
+				GeoObj(const GeoObj&) = default;
+				GeoObj(GeoObj&&) = default;
+				// disable assignment operators (due to problem of slicing)
+				GeoObj& operator= (const GeoObj&) = delete;
+				GeoObj& operator= (GeoObj&&) = delete;
+			};
+
+			// http://www.cppmove.com/code/poly/coord.hpp.html
+			class Coord {
+			private:
+				int m_x{ 0 };
+				int m_y{ 0 };
+			public:
+				// default constructor
+				Coord() = default;
+				Coord(int xarg, int yarg)
+					: m_x{ xarg }, m_y{ yarg }
+				{}
+				Coord(const Coord&) = default;
+				Coord(Coord&&) = default;
+				Coord& operator= (const Coord&) = default;
+				Coord& operator= (Coord&&) = default;
+
+				friend Coord operator+ (Coord c1, Coord c2) { // plus
+					return Coord{ c1.m_x + c2.m_x, c1.m_y + c2.m_y };
+				}
+				friend Coord operator- (Coord c1, Coord c2) { // diff
+					return Coord{ c1.m_x - c2.m_x, c1.m_y - c2.m_y };
+				}
+				Coord operator- () const { // negate
+					return Coord{ -m_x, -m_y };
+				}
+				void operator+= (Coord c) { // +=
+					*this = *this + c;	// or: m_x+=c.m_x; m_y+=c.m_y
+				}
+				void operator-= (Coord c) { // -=
+					operator+=(-c);	// or as above
+				}
+				int getX() const {
+					return m_x;
+				}
+				int getY() const {
+					return m_y;
+				}
+				friend std::ostream& operator<<(std::ostream& strm, Coord c) {
+					return strm << '(' << c.m_x << ',' << c.m_y << ')';
+				}
+			};
+			// http://www.cppmove.com/code/poly/polygon.hpp.html
+			class Polygon : public GeoObj {
+			protected:
+				std::vector<Coord> m_points;
+			public:
+				Polygon(std::string s, std::initializer_list<Coord> pl = {})
+					: GeoObj{ std::move(s) }, m_points{ std::move(pl) }
+				{}
+				virtual void draw() const override {
+					std::cout << "polygon '" << m_name << "' over";
+					for (auto& p : m_points) {
+						std::cout << " " << p;
+					}
+					std::cout << "\n";
+				}
+				//virtual ~Polygon() = default; // move semantics enabled
+			};
+			void run()
+			{
+				Polygon p0{ "Poly1", {Coord{1,1}, Coord{1,9}, Coord{9,9}, Coord{9,1}} };
+				Polygon p1{ p0 };				// copy
+				Polygon p2{ std::move(p0) };	// move
+
+				p0.draw();
+				p1.draw();
+				p2.draw();
+			}
+		}
 	}
 }

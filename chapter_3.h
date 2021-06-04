@@ -552,7 +552,31 @@ namespace chapter_3
 		{
 		private:
 			MyType value;
+			MyClass()
+				: Base(), value()
+			{}
+			// the default copy constructor
+			MyClass(const MyClass& obj)	// noexcept specifier
+				: Base(obj), value(obj.value)
+			{}
+			// the default move constructor
+			MyClass(MyClass&& obj)	// noexcept specifier
+				: Base(std::move(obj)), value(std::move(obj.value))
+			{}
+			// the default copy assignment
+			MyClass& operator=(const MyClass& obj)  // noexcept specifier
+			{
+				Base::operator=(obj);	// - perform assignment for base class members
+				value = obj.value;		// - assign new members
+				return *this;
+			}
+			// the default move assignment
+			MyClass& operator=(MyClass&& obj)  // noexcept specifier
+			{
+				Base::operator=(std::move(obj));	// - perform move assignment for base class members
+				value = std::move(obj.value);		// - move assign new members
+				return *this;
+			}
 		};
-
 	}
 }

@@ -61,6 +61,15 @@ void chapter_4_run()
     chapter_4::sec_4_3_6::run();
     chapter_4::sec_4_3_6::run2();
     chapter_4::sec_4_3_6::run3();
+
+    chapter_4::sec_4_4::sec_4_4_1::slicing_problem::run();
+    chapter_4::sec_4_4::sec_4_4_1::solve_slicing_problem::run();
+    chapter_4::sec_4_4::sec_4_4_2a::run();
+    chapter_4::sec_4_4::sec_4_4_2b::run();
+}
+
+void chapter_5_run()
+{
 }
 
 int main()
@@ -69,6 +78,7 @@ int main()
     //chapter_2_run();
     //chapter_3_run();
     chapter_4_run();
+    chapter_5_run();
 
     cin.get();
 }
@@ -83,3 +93,4 @@ int main()
 //   4. Use the Error List window to view errors
 //   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
 //   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+
