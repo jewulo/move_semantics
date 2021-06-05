@@ -678,7 +678,7 @@ namespace chapter_4
 				Coord& operator= (Coord&&) = default;
 
 				friend Coord operator+ (Coord c1, Coord c2) { // plus
-					return Coord{c1.m_x+c2.m_x, c1.m_y + c2.m_y };
+					return Coord{ c1.m_x+c2.m_x, c1.m_y + c2.m_y };
 				}
 				friend Coord operator- (Coord c1, Coord c2) { // diff
 					return Coord{ c1.m_x - c2.m_x, c1.m_y - c2.m_y };
@@ -806,7 +806,8 @@ namespace chapter_4
 					}
 					std::cout << "\n";
 				}
-				//virtual ~Polygon() = default; // move semantics enabled
+				//virtual ~Polygon() = default; // move semantics enabled by commenting out destructor
+				//virtual ~Polygon() = delete; // explicit deletion of destructor disables move semantics because an explicit deletion is a specification
 			};
 			void run()
 			{
