@@ -215,6 +215,8 @@ namespace chapter_5
 	{
 		class MyType {
 		public:
+			MyType() = default;
+
 			// disable assigning value to temporary objects:
 			MyType& operator=(const MyType& str) & = default;
 			MyType& operator=(MyType&& str) & = default;
@@ -223,6 +225,27 @@ namespace chapter_5
 			MyType(const MyType&) = default;
 			MyType(MyType&&) = default;
 		};
+
+		MyType retMyType()
+		{
+			MyType a;
+			return a;
+		}
+
+		void run(void)
+		{
+			MyType a;
+			MyType b;
+
+			// assign to lvalues
+			a = b;					// this works fine
+			a = retMyType();		// this works fine
+			// assign to temporaries (assign to rvalues)
+
+			//MyType{} = a;			// this is disabled
+			//MyType() = a;			// this is disabled
+			//retMyType() = a;		// this is disabled
+		}
 	}
 
 	// Reference Qualifiers for Other Member Functions

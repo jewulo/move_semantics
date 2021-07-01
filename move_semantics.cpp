@@ -79,6 +79,11 @@ void chapter_5_run()
     chapter_5::sec_5_1_3::run4();
     chapter_5::sec_5_1_3::run5();
     chapter_5::sec_5_2::run();
+    chapter_5::sec_5_3::run();
+}
+
+void chapter_6_run()
+{
 }
 
 int main()
@@ -88,6 +93,7 @@ int main()
     //chapter_3_run();
     //chapter_4_run();
     chapter_5_run();
+    chapter_6_run();
 
     cin.get();
 }
