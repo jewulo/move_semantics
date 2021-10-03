@@ -185,3 +185,9 @@ namespace chapter_6
 		}
 	}
 }
+
+namespace chapter_6
+{
+	// Dealing with Broken Invariants
+	namespace sec_6_3 {}
+}
