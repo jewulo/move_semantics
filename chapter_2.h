@@ -93,8 +93,8 @@ namespace chapter_2
 			foo1(std::move(s1));				// calls the 2nd overload, it might lose its value
 
 			std::string s2{ "hello" };
-			foo2(s1);							// calls foo2, it keeps its value
-			foo2(std::move(s1));				// also calls foo2, it keeps its value
+			foo2(s2);							// calls foo2, it keeps its value
+			foo2(std::move(s2));				// also calls foo2, it keeps its value
 
 			// an object marked with std::move() cannot be passed to a non-const lvalue reference
 			std::string s3{ "hello" };
