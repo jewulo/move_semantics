@@ -12,6 +12,7 @@ using namespace std;
 #include "chapter_3.h"
 #include "chapter_4.h"
 #include "chapter_5.h"
+#include "chapter_6.h"
 
 void chapter_1_run()
 {
@@ -84,6 +85,9 @@ void chapter_5_run()
 
 void chapter_6_run()
 {
+    chapter_6::sec_6_2_1::run();
+    chapter_6::sec_6_2_2::run();
+    chapter_6::sec_6_2_2::run2();
 }
 
 int main()
@@ -92,7 +96,7 @@ int main()
     //chapter_2_run();
     //chapter_3_run();
     //chapter_4_run();
-    chapter_5_run();
+    //chapter_5_run();
     chapter_6_run();
 
     cin.get();
