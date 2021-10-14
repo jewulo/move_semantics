@@ -80,7 +80,7 @@ namespace chapter_6
 			Customer c{"Michael Spencer"};
 
 			process(std::move(c)); // now both m_names and m_values have valid but unspecified values			
-			process2(c);	// use c after move semantics
+			process2(c);	// use c after move semantics is a potential bug
 		}	// destructor of c will clean up m_name and m_values (whatever their state is)
 	}
 }
