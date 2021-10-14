@@ -337,8 +337,8 @@ namespace chapter_6
 			}
 
 			// fix moving special member functions
-			SharedInt(SharedInt&& si)
-				:m_sp{ std::move(si.m_sp) }
+			SharedInt(SharedInt&& si) noexcept
+				:m_sp{ std::move(si.m_sp) } 
 			{
 				si.m_sp = moved_from_value;
 			}
@@ -365,7 +365,7 @@ namespace chapter_6
 			std::cout << si1.asString() << '\n';	// OK
 
 			SharedInt si3{ 42 };
-			SharedInt si4{ std::move(si3) };	// compiler does generate warning here because of move constructors
+			SharedInt si4{ std::move(si3) };
 
 			std::cout << si3.asString() << '\n';	
 		}
