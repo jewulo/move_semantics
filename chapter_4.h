@@ -5,6 +5,7 @@
 #include <vector>
 #include <chrono>
 #include <ratio>
+#include <array>
 
 namespace chapter_4
 {

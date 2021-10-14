@@ -85,9 +85,13 @@ void chapter_5_run()
 
 void chapter_6_run()
 {
-    chapter_6::sec_6_2_1::run();
-    chapter_6::sec_6_2_2::run();
-    chapter_6::sec_6_2_2::run2();
+    //chapter_6::sec_6_2_1::run();
+    //chapter_6::sec_6_2_2::run();
+    //chapter_6::sec_6_2_2::run2();
+    //chapter_6::sec_6_3_2::run();
+    //chapter_6::sec_6_3_2::run();
+    //chapter_6::sec_6_3_3::run();
+    chapter_6::sec_6_3_3b::run();
 }
 
 int main()
