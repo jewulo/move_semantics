@@ -38,5 +38,8 @@
     <ClInclude Include="chapter_6.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="chapter_7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
