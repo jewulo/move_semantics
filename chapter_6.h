@@ -333,7 +333,7 @@ namespace chapter_6
 
 			std::string asString() const
 			{
-				return std::to_string(*m_sp);	// OOPS: unconditional deref
+				return std::to_string(*m_sp);
 			}
 
 			// fix moving special member functions
