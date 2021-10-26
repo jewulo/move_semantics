@@ -151,6 +151,8 @@
     <ClInclude Include="chapter_5.h" />
     <ClInclude Include="chapter_6.h" />
     <ClInclude Include="chapter_7.h" />
+    <ClInclude Include="chapter_8.h" />
+    <ClInclude Include="isnothrowmovable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

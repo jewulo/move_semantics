@@ -360,7 +360,7 @@ namespace chapter_6
 		void run()
 		{
 			SharedInt si1{ 42 };
-			SharedInt si2{ si1 };	// si1 and si2 share the value 42
+			SharedInt si2{ si1 };	// si1 and si2 share the value location of int 42
 
 			std::cout << si1.asString() << '\n';	// OK
 
