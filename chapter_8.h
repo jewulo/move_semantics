@@ -128,7 +128,16 @@ namespace chapter_8
 	// Value Category of Functions
 	namespace sec_8_2_1
 	{
+		void f(int){}
 
+		void(&fref1)(int) = f;	// fref1 is an lvalue (fref1 is a reference to a function)
+		void(&&fref2)(int) = f;	// fref2 is also an lvalue (fref1 is a reference to a function)
+
+		auto& ar = std::move(f);	// OK 
 	}
 
+	// Value Category of Data Members
+	namespace sec_8_2_2
+	{
+	}
 }
