@@ -118,6 +118,13 @@ void chapter_8_run()
 
     chapter_8::sec_8_1_1::run();
     chapter_8::sec_8_1_2::run();
+    chapter_8::sec_8_1_3::run();
+    chapter_8::sec_8_2_2::run();
+    chapter_8::sec_8_2_2b::run();
+    chapter_8::sec_8_2_2c::run();
+    chapter_8::sec_8_2_2d::run();
+    chapter_8::sec_8_3::run();
+    chapter_8::sec_8_3_1::run();
 
     std::cout << std::endl;
 }
