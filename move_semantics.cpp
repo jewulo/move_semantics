@@ -115,18 +115,25 @@ void chapter_7_run()
 
 void chapter_8_run()
 {
-
     chapter_8::sec_8_1_1::run();
     chapter_8::sec_8_1_2::run();
     chapter_8::sec_8_1_3::run();
     chapter_8::sec_8_2_2::run();
     chapter_8::sec_8_2_2b::run();
-    chapter_8::sec_8_2_2c::run();
-    chapter_8::sec_8_2_2d::run();
+    //chapter_8::sec_8_2_2c::run(); // crash
+    //chapter_8::sec_8_2_2d::run(); // crash
     chapter_8::sec_8_3::run();
     chapter_8::sec_8_3_1::run();
+    chapter_8::sec_8_4::run();
+    chapter_8::sec_8_5::run();
+    chapter_8::sec_8_6_1::run();
+    chapter_8::sec_8_6_2::run();
 
     std::cout << std::endl;
+}
+
+void chapter_9_run()
+{
 }
 
 int main()

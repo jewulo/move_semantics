@@ -253,17 +253,28 @@ namespace chapter_8
 	// Impact of Value Categories When Binding References
 	namespace sec_8_3
 	{
-		std::string creatString();				// forward declaration
-		std::string foo1(const std::string&);	// forward declaration
-		std::string foo2(std::string&);			// forward declaration
+		std::string creatString()
+		{
+			return std::string{"hello world"};
+		}
+
+		std::string foo1(const std::string& s)
+		{
+			return s;
+		}
+
+		std::string foo2(std::string& s)
+		{
+			return s;
+		}
 
 		void run()
 		{
 			const std::string& r1{ creatString() };	// OK
-			std::string& r2{ creatString() };		// ERROR
+			//std::string& r2{ creatString() };		// ERROR
 
 			foo1(std::string{"hello"});				// OK
-			foo2(std::string{"hello"});				// ERROR
+			//foo2(std::string{"hello"});			// ERROR
 		}
 	}
 
@@ -275,10 +286,10 @@ namespace chapter_8
 		X v{};
 		const X c{};
 
-		void f(const X&);	// read only access
-		void f(X&);			// OUT parameter (usually long living object)
-		void f(X&&);		// can steal value (object usually about to die)
-		void f(const X&&);	// no clear semantic meaning
+		void f(const X&) {}		// read only access
+		void f(X&) {}			// OUT parameter (usually long living object)
+		void f(X&&) {}			// can steal value (object usually about to die)
+		void f(const X&&) {}	// no clear semantic meaning
 
 		void run()
 		{
@@ -287,5 +298,114 @@ namespace chapter_8
 			f(std::move(v));	// f(X&&);
 			f(std::move(c));	// f(const X&&);
 		}
+	}
+
+	// When lvalues become rvalues
+	namespace sec_8_4
+	{
+		void rvFunc(std::string&&) {}
+
+		void run()
+		{
+			std::string s{ "hello world" };
+
+			//rvFunc(s);			// ERROR: passing an lvalue to an rvalue reference
+			rvFunc(std::move(s));	// OK: passing an xvalue
+
+			// in some cases passing an lvalue will work if there is
+			// an implicit conversion to the parameter type
+			rvFunc("hello world");				// "hello world" implicitly converts to prvalue std::string("hello world")
+			rvFunc(std::string("hello world"));	// same as above using prvalue std::string("hello world")
+		}
+	}
+
+	// When rvalues become lvalues
+	namespace sec_8_5
+	{
+		void rvFunc2(std::string&&);	// forward declaration
+
+		void rvFunc(std::string&& s)
+		{
+			//rvFunc2(s);			// ERROR: s is an lvalue in the context of rvFunc
+			rvFunc2(std::move(s));	// you need std::move to convert s to an rvalue
+		}
+		void rvFunc2(std::string&&) {}
+		void run()
+		{
+			std::string s{ "hello world" };
+
+			rvFunc(std::move(s));
+		}
+	}
+
+	// Checking Value Categories with decltype
+	namespace sec_8_6 {}
+
+	// Using decltype to Check the Types of Names
+	namespace sec_8_6_1
+	{
+		void rvFunc(std::string&& str)
+		{
+			std::cout << std::boolalpha;
+
+			std::cout << std::is_same<decltype(str), std::string>::value << std::endl;		// false
+			std::cout << std::is_same<decltype(str), std::string&>::value << std::endl;		// false
+			std::cout << std::is_same<decltype(str), std::string&&>::value << std::endl;	// true
+
+			std::cout << std::is_reference<decltype(str)>::value << std::endl;			// true
+			std::cout << std::is_lvalue_reference<decltype(str)>::value << std::endl;	// false
+			std::cout << std::is_rvalue_reference<decltype(str)>::value << std::endl;	// true
+
+			std::cout << std::noboolalpha;
+		}
+
+		void rvFunc2(std::string&& str)
+		{
+			std::remove_reference<decltype(str)>::type tmp;	// tmp is std::string
+		}
+
+		void run()
+		{
+			std::string s{ "hello world" };
+
+			rvFunc(std::move(s));
+			rvFunc2(std::move(s));
+		}
+	}
+
+	// Using decltype to Check the Value Category
+	namespace sec_8_6_2
+	{ 
+		void rvFunc(std::string&& str)
+		{
+			decltype(str + str) s;		// yields std::string because s+s is a prvalue
+			decltype(str[0]) c{str[0]};	// yields char& because index operator yields an lvalue
+		}
+
+		void rvFunc2(std::string&& str)
+		{
+			// str is a name
+			// (str) is an expression
+			std::cout << std::boolalpha;
+
+			std::cout << std::is_same<decltype((str)), std::string>::value << std::endl;		// false
+			std::cout << std::is_same<decltype((str)), std::string&>::value << std::endl;		// false
+			std::cout << std::is_same<decltype((str)), std::string&&>::value << std::endl;	// true
+
+			std::cout << std::is_reference<decltype((str))>::value << std::endl;			// true
+			std::cout << std::is_lvalue_reference<decltype((str))>::value << std::endl;	// false
+			std::cout << std::is_rvalue_reference<decltype((str))>::value << std::endl;	// true
+
+			std::cout << std::noboolalpha;
+		}
+
+		void run()
+		{
+			std::string s{ "hello world" };
+
+			rvFunc(std::move(s));
+			rvFunc2(std::move(s));
+		}
+
 	}
 }
