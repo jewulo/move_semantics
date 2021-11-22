@@ -89,7 +89,7 @@ namespace chapter_8
 			f(std::move(v));	// passes a xvalue
 
 			int x = 3;			// here, x is a variable, not an lvalue
-			int y = x;			// here, x is an lvalue
+			int y = x;			// here, x is an lvalue (at this point x is addressable)
 		}
 	}
 
@@ -296,7 +296,7 @@ namespace chapter_8
 			f(v);				// f(X&);
 			f(c);				// f(const X&);
 			f(std::move(v));	// f(X&&);
-			f(std::move(c));	// f(const X&&);
+			f(std::move(c));	// f(const X&&); // error: C26478 you cannot move constants
 		}
 	}
 
@@ -404,8 +404,7 @@ namespace chapter_8
 			std::string s{ "hello world" };
 
 			rvFunc(std::move(s));
-			rvFunc2(std::move(s));
+			rvFunc2(std::move(s));	// ERROR C26800: Used of moved from object.
 		}
-
 	}
 }
