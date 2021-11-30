@@ -144,6 +144,8 @@ void chapter_9_run()
     chapter_9::sec_9_2_1a::run();
     //chapter_9::sec_9_2_1b::run();   // const version
     //chapter_9::sec_9_2_1c::run();   // volatile version
+    chapter_9::sec_9_2_2::run();
+    chapter_9::sec_9_2_3::run();
     std::cout << std::endl;
 }
 

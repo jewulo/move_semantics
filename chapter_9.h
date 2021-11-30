@@ -276,6 +276,7 @@ namespace chapter_9
 		void foo(X&& x) {}			// for values that are no longer used (move semantics)
 		void foo(const X&& x) {}	// semanticly meaningless type
 
+		// A generic rvalue qualified with const or volatile is not a universal reference
 		template<typename T>
 		void callFoo(const T&& arg) {
 			foo(std::forward<T>(arg));	// equivalent to foo(std::move(arg)) for passed rvalues
@@ -315,6 +316,7 @@ namespace chapter_9
 		void foo(X&& x) {}			// for values that are no longer used (move semantics)
 		void foo(const X&& x) {}	// semanticly meaningless type
 
+		// A generic rvalue qualified with const or volatile is not a universal reference
 		template<typename T>
 		void callFoo(volatile T&& arg) {
 			foo(std::forward<T>(arg));	// equivalent to foo(std::move(arg)) for passed rvalues
@@ -336,7 +338,86 @@ namespace chapter_9
 
 	// std::forward<>()
 	namespace sec_9_2_2
-	{
+	{	
+		class Person {
+		private:
+			std::string m_name;
+		public:
+			Person(const char* n)
+				: m_name{ n }
+			{}
+			// print out when we copy
+			Person(const Person& p)
+				: m_name{ p.m_name }
+			{
+				std::cout << "COPY: " << m_name << '\n';
+			}
+			// print out when we copy
+			Person(Person&& p)
+				: m_name{ std::move(p.m_name) }
+			{
+				std::cout << "MOVE: " << m_name << '\n';
+			}
+			void print() const {
+				std::cout << getName() << '\n';
+			}
+			std::string getName() && {		// when we no longer need the value
+				return std::move(m_name);	// we steal and return by value
+			}
+			const std::string& getName() const& {	// in all other cases
+				return m_name;						// we give access to the member
+			}
+		};
 
+		// In a function that takes a universal reference,
+		// we might then benefit from using std::forward as follows
+		template <typename T>
+		void foo(T&& x)
+		{
+			x.print();						// OK, no need to forward the passed value category
+
+			x.getName();					// calls getName() const&
+			std::forward<T>(x).getName();	// calls getName() && for rvalues (OK, no longer need x)
+			std::forward<T>(x).print();
+		}
+		void run()
+		{
+			Person p{ "Wolfgang Amadeus Morzart" };
+
+			foo(p);
+			std::cout << std::endl;
+		}
 	}
+
+	// The Effects of Perfect Forwarding
+	namespace sec_9_2_3
+	{
+		// Combining the behaviour of declaring a Universal Reference
+		// and using std::forward<>() we get the following behaviour:
+		class X{};
+		void foo(const X&)	{}	// for constant values (read only access)
+		void foo(X&)		{}	// for variable values (out parameters)
+		void foo(X&&)		{}	// for values that are no longer used (move semantics)
+
+		template<typename T>
+		void callFoo(T&& arg) {
+			foo(std::forward<T>(arg));	// equivalent to foo(std::move(arg)) for passed rvalues
+		}
+
+		void run()
+		{
+			X v;
+			const X c;
+
+			callFoo(v);				// OK, expands to foo(arg), so it calls foo(X&)
+			callFoo(c);				// OK, expands to foo(arg), so it calls foo(const X&)
+			callFoo(X{});			// OK, expands to foo(std::move(arg)), so it calls foo(X&&)
+			callFoo(std::move(v));	// OK, expands to foo(std::move(arg)), so it calls foo(X&&)
+			callFoo(std::move(c));	// OK, expands to foo(std::move(arg)), so it calls foo(X&&)
+		}
+	}
+
+	// Rvalue References versus Universal References
+	namespace sec_9_3
+	{ }
 }
