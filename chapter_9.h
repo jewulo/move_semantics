@@ -419,5 +419,20 @@ namespace chapter_9
 
 	// Rvalue References versus Universal References
 	namespace sec_9_3
+	{
+		class Coll{};
+		void foo(Coll&& arg);	// arg is an ordinary rvalue reference of type Coll
+
+		template <typename T>
+		void foo(T&& arg);		// arg is a universal/forwarding reference
+	}
+
+	// Rvalue References of Actual Types
+	namespace sec_9_3_1
 	{ }
+
+	// Rvalue References of Function Template Parameters
+	namespace sec_9_3_2
+	{
+	}
 }
