@@ -146,7 +146,18 @@ void chapter_9_run()
     //chapter_9::sec_9_2_1c::run();   // volatile version
     chapter_9::sec_9_2_2::run();
     chapter_9::sec_9_2_3::run();
+    chapter_9::sec_9_3_1::run();
+    //chapter_9::sec_9_3_2::run();
+    chapter_9::sec_9_4_1::run();
+    chapter_9::sec_9_4_1a::run();
+    chapter_9::sec_9_4_1b::run();
+    chapter_9::sec_9_5::run();
+
     std::cout << std::endl;
+}
+
+void chapter_10_run()
+{
 }
 
 int main()

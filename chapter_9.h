@@ -409,11 +409,11 @@ namespace chapter_9
 			X v;
 			const X c;
 
-			callFoo(v);				// OK, expands to foo(arg), so it calls foo(X&)
-			callFoo(c);				// OK, expands to foo(arg), so it calls foo(const X&)
-			callFoo(X{});			// OK, expands to foo(std::move(arg)), so it calls foo(X&&)
-			callFoo(std::move(v));	// OK, expands to foo(std::move(arg)), so it calls foo(X&&)
-			callFoo(std::move(c));	// OK, expands to foo(std::move(arg)), so it calls foo(X&&)
+			callFoo(v);				// OK, expands to callFoo(arg), so it calls foo(X&)
+			callFoo(c);				// OK, expands to callFoo(arg), so it calls foo(const X&)
+			callFoo(X{});			// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
+			callFoo(std::move(v));	// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
+			callFoo(std::move(c));	// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
 		}
 	}
 
@@ -429,10 +429,223 @@ namespace chapter_9
 
 	// Rvalue References of Actual Types
 	namespace sec_9_3_1
-	{ }
+	{
+		using Coll = std::vector<std::string>;
+
+		void bar(Coll&& arg)
+		{
+		}
+
+		void foo(Coll&& arg)		// arg is an ordinary rvalue reference of type Coll
+		{
+			Coll coll;				// coll can't be const (because are it is not template code)
+
+			bar(std::move(coll));	// perfectly forward to bar() (no need to use std::forward<>() here)
+		}
+
+		void run()
+		{
+			Coll v;
+			const Coll c;
+
+			//foo(v);				// ERROR, can't bind rvalue reference to lvalue
+			//foo(c);				// ERROR, can't bind rvalue reference to lvalue
+			foo(Coll{});		// OK, arg binds to a non-const prvalue
+			foo(std::move(v));	// OK, arg binds to a non-const xvalue
+			//foo(std::move(c));	// ERROR, can't bind non-const rvalue reference to const xvalue
+		}
+	}
 
 	// Rvalue References of Function Template Parameters
-	namespace sec_9_3_2
+	//namespace sec_9_3_2
+	//{
+	//	template<typename T>
+	//	void bar(T&& arg)
+	//	{
+	//	}
+
+	//	template<typename T>
+	//	void foo(T&& arg)		// arg is a universal/forwarding reference
+	//	{
+	//		T coll;				// coll may be const
+
+	//		bar(std::forward(coll));	// perfectly forward to bar() (don't use std::move() here)
+	//	}
+
+	//	void run()
+	//	{
+	//		using Coll = std::vector<std::string>;
+
+	//		std::vector<std::string> v;
+	//		const std::vector<std::string> c;
+
+	//		foo(v);				// OK, arg binds to a non-const lvalue
+	//		foo(c);				// OK, arg binds to a const lvalue
+	//		foo(Coll{});		// OK, arg binds to a non-const prvalue
+	//		foo(std::move(v));	// OK, arg binds to a non-const xvalue
+	//		foo(std::move(c));	// OK, arg binds to a const xvalue
+	//	}
+
+	//}
+
+	// Overload Resolution with Universal References
+	namespace sec_9_4
 	{
+		class X {};
+		X v;
+		const X c;
+
+		void f(const X&);		// read only access
+		void f(X&);				// OUT parameter (usually long living objects)
+		void f(X&&);			// can steal value (object usually about to die)
+		void f(const X&&);		// contradicting semantic meaning
+		template <typename T>
+		void f(T&&);			// to use perfect forwarding
+		// Note that the universal reference is always the second best option.
 	}
+
+	// Fixing Overload Resolution with Universal References
+	namespace sec_9_4_1
+	{
+		class X {
+		public:
+			X() = default;
+
+			X(const X&) {
+				std::cout << "copy constructor\n";
+			}
+
+			X(X&&) {
+				std::cout << "move constructor\n";
+			}
+
+			template<typename T>
+			X(T&&) {
+				std::cout << "universal constructor\n";
+			}
+		};
+		void run()
+		{
+			X xv;
+			const X xc;
+
+			X xcc{ xc };			// OK: calls copy constructor
+			X xvc{ xv };			// OK: calls universal constructor
+			X xvm{ std::move(xv) };	// OK: calls move constructor
+			X xcm{ std::move(xc) };	// OK: calls universal constructor
+
+		}
+	}
+
+	// Constraining Universal References since C++20
+	namespace sec_9_4_1a
+	{
+		class X {
+		public:
+			X() = default;
+
+			X(const X&) {
+				std::cout << "copy constructor\n";
+			}
+
+			X(X&&) noexcept {
+				std::cout << "move constructor\n";
+			}
+
+			// using C++20 template constraints
+			template<typename T>
+				requires (!std::is_same_v<std::remove_cvref_t<T>, X>)
+			X(T&&) {
+				std::cout << "universal constructor\n";
+			}
+		};
+		void run()
+		{
+			X xv;
+			const X xc;
+
+			X xcc{ xc };			// OK: calls copy constructor
+			X xvc{ xv };			// OK: calls universal constructor
+			X xvm{ std::move(xv) };	// OK: calls move constructor
+			X xcm{ std::move(xc) };	// OK: calls universal constructor
+
+		}
+
+	}
+
+	// Constraining Universal References before C++20
+	namespace sec_9_4_1b
+	{
+
+		class X {
+		public:
+			X() = default;
+
+			X(const X&) {
+				std::cout << "copy constructor\n";
+			}
+
+			X(X&&) noexcept {
+				std::cout << "move constructor\n";
+			}
+
+			// using template meta programming
+			template<typename T,
+				typename
+				= typename std::enable_if<!std::is_same<typename std::decay<T>::type,
+														X>::value
+										>::type>
+			X(T&&) {
+				std::cout << "universal constructor\n";
+			}
+		};
+
+		void run()
+		{
+			X xv;
+			const X xc;
+
+			X xcc{ xc };			// OK: calls copy constructor
+			X xvc{ xv };			// OK: calls universal constructor
+			X xvm{ std::move(xv) };	// OK: calls move constructor
+			X xcm{ std::move(xc) };	// OK: calls universal constructor
+
+		}
+
+	}
+
+	// Perfect Forwarding in Lambdas
+	namespace sec_9_5
+	{
+		// Combining the behaviour of declaring a Universal Reference
+		// and using std::forward<>() we get the following behaviour:
+		class X {};
+		void foo(const X&) {}	// for constant values (read only access)
+		void foo(X&) {}	// for variable values (out parameters)
+		void foo(X&&) {}	// for values that are no longer used (move semantics)
+
+		//template<typename T>
+		//void callFoo(T&& arg) {
+		//	foo(std::forward<T>(arg));	// equivalent to foo(std::move(arg)) for passed rvalues
+		//}
+
+		void run()
+		{
+			// since C++20 you can alswo use template parameters in lambdas
+			auto callFoo = []<typename T>(T && arg) {
+				foo(std::forward<T>(arg));	// equivalent to foo(std::move(arg)) for passed rvalues
+			};
+
+			X v;
+			const X c;
+
+			callFoo(v);				// OK, expands to callFoo(arg), so it calls foo(X&)
+			callFoo(c);				// OK, expands to callFoo(arg), so it calls foo(const X&)
+			callFoo(X{});			// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
+			callFoo(std::move(v));	// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
+			callFoo(std::move(c));	// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
+		}
+
+	}
+
 }
