@@ -171,6 +171,8 @@ int main()
     chapter_7_run();
     chapter_8_run();
     chapter_9_run();
+    chapter_10_run();
+
     cin.get();
 }
 
