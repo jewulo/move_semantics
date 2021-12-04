@@ -624,15 +624,27 @@ namespace chapter_9
 		void foo(X&) {}	// for variable values (out parameters)
 		void foo(X&&) {}	// for values that are no longer used (move semantics)
 
-		//template<typename T>
-		//void callFoo(T&& arg) {
-		//	foo(std::forward<T>(arg));	// equivalent to foo(std::move(arg)) for passed rvalues
-		//}
+		template<typename T>
+		void callFoo(T&& arg) {
+			foo(std::forward<T>(arg));	// equivalent to foo(std::move(arg)) for passed rvalues
+		}
 
 		void run()
 		{
-			// since C++20 you can alswo use template parameters in lambdas
-			auto callFoo = []<typename T>(T && arg) {
+			X v;
+			const X c;
+
+			callFoo(v);				// OK, expands to callFoo(arg), so it calls foo(X&)
+			callFoo(c);				// OK, expands to callFoo(arg), so it calls foo(const X&)
+			callFoo(X{});			// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
+			callFoo(std::move(v));	// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
+			callFoo(std::move(c));	// OK, expands to callFoo(std::move(arg)), so it calls foo(X&&)
+		}
+
+		void run2()
+		{
+			// since C++20 you can also use template parameters in lambdas
+			auto callFoo = []<typename T>(T&& arg) {
 				foo(std::forward<T>(arg));	// equivalent to foo(std::move(arg)) for passed rvalues
 			};
 

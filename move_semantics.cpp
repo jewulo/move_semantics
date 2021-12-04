@@ -151,7 +151,9 @@ void chapter_9_run()
     chapter_9::sec_9_4_1::run();
     chapter_9::sec_9_4_1a::run();
     chapter_9::sec_9_4_1b::run();
+    
     chapter_9::sec_9_5::run();
+    chapter_9::sec_9_5::run2();
 
     std::cout << std::endl;
 }
@@ -171,6 +173,8 @@ int main()
     chapter_7_run();
     chapter_8_run();
     chapter_9_run();
+    chapter_10_run();
+
     cin.get();
 }
 
