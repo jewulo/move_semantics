@@ -16,6 +16,7 @@ using namespace std;
 #include "chapter_7.h"
 #include "chapter_8.h"
 #include "chapter_9.h"
+#include "chapter_10.h"
 
 void chapter_1_run()
 {
@@ -160,6 +161,16 @@ void chapter_9_run()
 
 void chapter_10_run()
 {
+    chapter_10::sec_10_1_1::run();
+    chapter_10::sec_10_1_2::run();
+    chapter_10::sec_10_1_3a::run();
+    chapter_10::sec_10_1_3b::run();
+    chapter_10::sec_10_1_3c::run();
+    chapter_10::sec_10_1_3d::run();
+    chapter_10::sec_10_1_3e::run();
+    chapter_10::sec_10_2_2::run();
+
+    std::cout << std::endl;
 }
 
 int main()
