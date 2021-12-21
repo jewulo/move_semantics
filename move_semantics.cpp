@@ -169,7 +169,15 @@ void chapter_10_run()
     chapter_10::sec_10_1_3d::run();
     chapter_10::sec_10_1_3e::run();
     chapter_10::sec_10_2_2::run();
-
+    chapter_10::sec_10_3::run();
+    chapter_10::sec_10_3_1a::run(); 
+    chapter_10::sec_10_3_1b::run();
+    //chapter_10::sec_10_3_2a::run(); // compiler ERROR
+    chapter_10::sec_10_3_2b::run();
+    chapter_10::sec_10_3_2c::run();
+    chapter_10::sec_10_3_2d::run();
+    chapter_10::sec_10_3_3a::run();
+    chapter_10::sec_10_3_3b::run();
     std::cout << std::endl;
 }
 

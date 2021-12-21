@@ -258,7 +258,7 @@ namespace chapter_10
 
 			// function in class template:
 			void insert(T&& arg) {
-				values.push_back(val);
+				values.push_back(arg);
 			}
 		};
 
@@ -319,8 +319,355 @@ namespace chapter_10
 		}
 	}
 
+	// Rvalue References of Parameters in Full Specializations
+	namespace sec_10_2_3b
+	{
+		// Note:
+		// You have to declare/define full specializations of member
+		// function template outside the class definitions
+		template <typename T>
+		class Cont {
+		private:
+			std::vector<std::string> coll;
+		public:
+			// primary template
+			template <typename U>
+			void insert(U&& v) {	// universal reference
+				coll.push_back(std::forward<U>(v));
+			}
+		};
+
+		// full specializations for Cont<T>::insert<>()
+		// - have to be outside the class
+		// - need specializations for rvalues and lvalues
+
+		// specialization for rvalue, where T = std::string
+		template<>
+			template<>
+		void Cont<std::string>::insert<>(std::string&& v)
+		{
+			coll.push_back(std::move(v));
+		}
+		// specialization for lvalue, where T = std::string
+		template<>
+			template<>
+		void Cont<std::string>::insert<>(const std::string& v)
+		{
+			coll.push_back(v);
+		}
+
+		void run(void)
+		{
+			Cont<std::string> contstr;
+			std::string s{ "string" };
+			const std::string cs{ "const string" };
+
+			contstr.insert(s);		// calls insert<std::string&>(std::string&)
+			contstr.insert(cs);		// calls insert<const std::string&>(const std::string&)
+
+			contstr.insert(std::string{ "string" });	// calls insert<std::string&&>(std::string&&)
+			contstr.insert(std::move(s));				// calls insert<std::string&&>(std::string&&)
+			contstr.insert(std::move(cs));				// calls insert<const std::string&&>(const std::string&&)
+
+			// when there are no specialisations only the universal template is called
+			// by applying reference folding rules.
+			// Note that Cont<> was not specialized fot int.
+			/*Cont<int> contint;
+			int i{ 0 };
+			const int ci{ 1 };
+
+			contint.insert(i);
+			contstr.insert(ci);
+
+			contint.insert(int{0});
+			contstr.insert(std::move(i));*/
+		}
+	}
+
 	// How the Standard Specifies Perfect Forwarding
 	namespace sec_10_3
-	{ }
+	{
+		template <typename T>
+		void g(const T& coll)
+		{}
+		template <typename T>
+		void g(T& coll)
+		{}
+		//template <typename T>
+		//void g(T&& coll)
+		//{}
+
+		// This is why it is called a Universal References.
+		template <typename T>
+		void f(T&& arg)				// arg is universal/forwarding reference
+		{
+			g(std::forward<T>(arg));	// perfectly forward (move() only for passed rvalues)
+		}
+
+		class MyType{};
+		void func(int){}
+
+		void run(void)
+		{
+			{
+				MyType v;
+
+				f(MyType{});				// T is deduced as MyType, so arg is declared as MyType&&
+				f(std::move(v));			// T is deduced as MyType, so arg is declared as MyType&&
+			}
+
+			{
+				MyType v;
+				const MyType c;
+
+				f(v);			// T is deduced as MyType& and arg as this type
+				f(c);			// T is deduced as const MyType& and arg as this type
+			}
+
+			{
+				MyType v;
+				const MyType c;
+
+				f(v);				// T and arg are MyType&, forward() has no effect in this case 
+				f(c);				// T and arg are const MyType&, forward() has no effect in this case 
+				f(MyType{});		// T is MyType, arg is MyType&&, forward() is equivalent to move()
+				f(std::move(v));	// T is MyType, arg is MyType&&, forward() is equivalent to move()
+			}
+
+			{
+				// NOTE: string literals are lvalues, so we deduce T and arg as follows
+				f("hi");				// lvalue passed, so T and arg have type const char(&)[3]
+				f(std::move("hi"));		// xvalue passed, so T is deduced as const char[3]
+										//				  and arg have type const char(&&)[3]
+			}
+
+			{
+				// References to functions are always lvalues
+				f(func);				// lvalue passed to f(), so T and arg have type void(&)(int)
+				f(std::move(func));		// lvalue passed to f(), so T and arg have type void(&)(int)
+			}
+
+		}
+	}
+	// Explicit Specification of Types for Universal Refernces
+	namespace sec_10_3_1a
+	{
+		template <typename T>
+		void g(const T& coll)
+		{}
+		template <typename T>
+		void g(T& coll)
+		{}
+
+		template <typename T>
+		void f(T&& arg)				// arg is universal/forwarding reference
+		{
+			g(std::forward<T>(arg));	// perfectly forward (move() only for passed rvalues)
+		}
+
+		void run(void)
+		{
+			std::string s{ "Hello" };
+
+			/*
+			* f<std::string>(...);			// arg is a raw rvalue reference binding to rvalues only
+			* f<std::string&>(...);			// arg is an lvalue reference binding to non-const lvalues only
+			* f<const std::string&>(...);	// arg is an const lvalue reference binding to everything
+			* f<std::string&&>(...)			// arg is a raw rvalue reference binding to rvalues only
+			*/
+			//f<std::string>(s);				// ERROR: cannot bind rvalue reference to lvalue
+			f<std::string&>(s);					// OK: does not move and forward s
+			f<std::string>(std::move(s));		// OK: does move and forward s
+			f<std::string&&>(std::move(s));		// OK: does move and forward s
+			// The last two calls are considered equivalent
+		}
+	}
+	// Explicit Specification of Types for Universal Refernces
+	namespace sec_10_3_1b
+	{
+		// The rules for Explicit Specification of Types for Universal Refernces
+		// also applies in C++20 with auto&& parameters.
+		template <typename T>
+		void g(const T& coll)
+		{}
+		template <typename T>
+		void g(T& coll)
+		{}
+
+		void f(auto&& arg)				// arg is universal/forwarding reference
+		{
+			g(std::forward<decltype(arg)>(arg));	// perfectly forward (move() only for passed rvalues)
+		}
+
+		void run(void)
+		{
+			std::string s{ "Hello" };
+
+			/*
+			* f<std::string>(...);			// arg is a raw rvalue reference binding to rvalues only
+			* f<std::string&>(...);			// arg is an lvalue reference binding to non-const lvalues only
+			* f<const std::string&>(...);	// arg is an const lvalue reference binding to everything
+			* f<std::string&&>(...)			// arg is a raw rvalue reference binding to rvalues only
+			*/
+			//f<std::string>(s);				// ERROR: cannot bind rvalue reference to lvalue
+			f<std::string&>(s);					// OK: does not move and forward s
+			f<std::string>(std::move(s));		// OK: does move and forward s
+			f<std::string&&>(std::move(s));		// OK: does move and forward s
+			// The last two calls are considered equivalent
+		}
+	}
+	// Conflicting Template Parameter Deduction with Universal Refernces
+	namespace sec_10_3_2{}
+	// Problem:
+	namespace sec_10_3_2a
+	{
+		//template <typename T>
+		//void insert(std::vector<T>& vec, T&& elem)
+		//{
+		//	vec.push_back(std::forward<T>(elem));
+		//}
+
+		//void run(void)
+		//{
+		//	std::vector<std::string> coll;
+		//	std::string s;
+
+		//	insert(coll, s);	// ERROR: No matching function call
+		//}
+	}
+	// Solution 1:
+	namespace sec_10_3_2b
+	{
+		template <typename T>
+		void insert(std::vector<std::remove_reference_t<T>>& vec, T&& elem)
+		{
+			vec.push_back(std::forward<T>(elem));
+		}
+
+		void run(void)
+		{
+			std::vector<std::string> coll;
+			std::string s;
+
+			insert(coll, s);	// OK: with T deduced as std::string& vec now binds to coll
+		}
+	}
+	// Solution 2:
+	namespace sec_10_3_2c
+	{
+		template <typename T1, typename T2>
+		void insert(std::vector<T1>& vec, T2&& elem)
+		{
+			vec.push_back(std::forward<T2>(elem));
+		}
+
+		void run(void)
+		{
+			std::vector<std::string> coll;
+			std::string s;
+
+			insert(coll, s);	// OK: with T deduced as std::string& vec now binds to coll
+		}
+	}
+	// Solution 3:
+	namespace sec_10_3_2d
+	{
+		template <typename Coll, typename T>
+		void insert(Coll& vec, T&& elem)
+		{
+			vec.push_back(std::forward<T>(elem));
+		}
+
+		void run(void)
+		{
+			std::vector<std::string> coll;
+			std::string s;
+
+			insert(coll, s);	// OK: 
+		}
+	}
+
+	// Pure RValue References of Generic Types
+	namespace sec_10_3_3a
+	{
+		class MyType {};
+
+		template<typename T>	// primary template
+		void foo(T&& arg)		// arg is a universal reference
+		{}
+
+		template <typename T>
+		requires (!std::is_lvalue_reference_v<T>)	// bind to rvalues only
+		void callFoo(T&& arg)
+		{
+			foo(std::forward<T>(arg));
+		}
+
+		void run(void)
+		{
+			MyType m;			
+			const MyType cm;
+
+			//callFoo(m);		// ERROR: passing an lvalue
+			//callFoo(cm);		// ERROR: passing a const lvalue
+
+			callFoo(MyType{});	// passing an rvalue
+			callFoo(MyType());	// passing an rvalue
+
+			callFoo(std::move(m));	// passing an xvalue
+			callFoo(std::move(cm));	// passing an const xvalue - semantically stupid
+		}
+	}
+	namespace sec_10_3_3b
+	{
+		class MyType {};
+
+		template<typename T>	// primary template
+		void foo(T&& arg)		// arg is a universal reference
+		{}
+		// before C++20, the type trait std::enable_if<> had to be used 
+		template <typename T,
+				  typename
+					= typename std::enable_if<!std::is_lvalue_reference<T>::value
+											>::type>	// bind to rvalues only
+		void callFoo(T&& arg)
+		{
+			foo(std::forward<T>(arg));
+		}
+
+		void run(void)
+		{
+			MyType m;
+			const MyType cm;
+
+			//callFoo(m);		// ERROR: passing an lvalue
+			//callFoo(cm);		// ERROR: passing a const lvalue
+
+			callFoo(MyType{});	// passing an rvalue
+			callFoo(MyType());	// passing an rvalue
+
+			callFoo(std::move(m));	// passing an xvalue
+			callFoo(std::move(cm));	// passing an const xvalue - semantically stupid
+		}
+	}
+
+	// Nasty Details of Perfect Forwarding
+	namespace sec_10_4
+	{
+		void run(void)
+		{}
+	}
+	// Universal versus Forwarding References
+	namespace sec_10_4_1
+	{
+		void run(void)
+		{}
+	}
+	// Why && for Both Ordinary Rvalues and Universal References?
+	namespace sec_10_4_2
+	{
+		void run(void)
+		{}
+	}
 }
 
