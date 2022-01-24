@@ -17,6 +17,7 @@ using namespace std;
 #include "chapter_8.h"
 #include "chapter_9.h"
 #include "chapter_10.h"
+#include "chapter_11.h"
 
 void chapter_1_run()
 {
@@ -178,6 +179,15 @@ void chapter_10_run()
     chapter_10::sec_10_3_2d::run();
     chapter_10::sec_10_3_3a::run();
     chapter_10::sec_10_3_3b::run();
+
+    std::cout << std::endl;
+}
+
+void chapter_11_run()
+{
+    chapter_11::sec_11_1_1::run();
+    chapter_11::sec_11_2::run();
+
     std::cout << std::endl;
 }
 
@@ -193,6 +203,7 @@ int main()
     chapter_8_run();
     chapter_9_run();
     chapter_10_run();
+    chapter_11_run();
 
     cin.get();
 }
