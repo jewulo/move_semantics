@@ -187,8 +187,26 @@ void chapter_11_run()
 {
     chapter_11::sec_11_1_1::run();
     chapter_11::sec_11_2::run();
+    chapter_11::sec_11_2_1::run();
+    chapter_11::sec_11_2_2::run();
+    chapter_11::sec_11_3_1a::run();
+    chapter_11::sec_11_3_1b::run();
+    chapter_11::sec_11_3_1c::run();
+    chapter_11::sec_11_3_1d::run();
+    // !!!! BUG chapter_11::sec_11_3_1e::run(); // !!!! BUG
+    //chapter_11::sec_11_3_1f::run();
+    chapter_11::sec_11_3_1g::run();
+    //chapter_11::sec_11_3_1h::run();
+    chapter_11::sec_11_3_1i::run();
+    chapter_11::sec_11_4a::run();
+    chapter_11::sec_11_5a::run();
+    chapter_11::sec_11_5b::run();
 
     std::cout << std::endl;
+}
+
+void chapter_12_run()
+{
 }
 
 int main()
@@ -204,6 +222,7 @@ int main()
     chapter_9_run();
     chapter_10_run();
     chapter_11_run();
+    chapter_12_run();
 
     cin.get();
 }
