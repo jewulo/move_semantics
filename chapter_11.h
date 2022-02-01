@@ -454,8 +454,48 @@ namespace chapter_11
 			callFoo(std::move(s));
 		}
 	}
-
+	// using variadics
 	namespace sec_11_4b
+	{
+		void foo(const std::string& s)
+		{
+			std::cout << "foo(const std::string&) : " << s << std::endl;
+		}
+		void foo(const std::string& s1, const std::string& s2)
+		{
+			std::cout << "foo(const std::string& s1, const std::string& s2) : "
+				<< s1
+				<< " "
+				<< s2
+				<< std::endl;
+		}
+		void foo(const std::string& s1, const std::string& s2, const std::string& s3)
+		{
+			std::cout << "foo(const std::string& s1, const std::string& s2, const std::string& s3) : "
+				<< s1
+				<< " "
+				<< s2
+				<< " "
+				<< s3
+				<< std::endl;
+		}
+
+		void run()
+		{
+			auto callFoo = [](auto&&... arg) {				// arg is a universal/forwarding reference
+				foo(std::forward<decltype(arg)>(arg)...);
+			};
+
+			std::string s1{ "BLM1" };
+			std::string s2{ "BLM2" };
+			std::string s3{ "BLM3" };
+			callFoo(s1);
+			callFoo(s1, s2);
+			callFoo(s1, s2, s3);
+		}
+	}
+
+	namespace sec_11_4c
 	{
 		void foo(const std::string& s)
 		{
@@ -477,6 +517,7 @@ namespace chapter_11
 			callFoo(std::move(s));
 		}
 	}
+
 	// Using auto&& in C++20 Function Declarations
 	// substituting auto&& with template T&&
 	namespace sec_11_5a
