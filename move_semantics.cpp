@@ -19,6 +19,7 @@ using namespace std;
 #include "chapter_10.h"
 #include "chapter_11.h"
 #include "chapter_12.h"
+#include "chapter_13.h"
 
 void chapter_1_run()
 {
@@ -219,6 +220,18 @@ void chapter_12_run()
     chapter_12::sec_12_2_1::run();
 }
 
+void chapter_13_run()
+{
+    chapter_13::sec_13_1_1::run();
+    chapter_13::sec_13_1_2::run();
+    chapter_13::sec_13_1_2b::run();
+    chapter_13::sec_13_1_2c::run();
+    chapter_13::sec_13_1_3a::run();
+    chapter_13::sec_13_1_3b::run();
+    chapter_13::sec_13_1_3c::run();
+    chapter_13::sec_13_1_4::run();
+}
+
 int main()
 {
     //chapter_1_run();
@@ -233,6 +246,7 @@ int main()
     chapter_10_run();
     chapter_11_run();
     chapter_12_run();
+    chapter_13_run();
 
     cin.get();
 }
@@ -247,4 +261,5 @@ int main()
 //   4. Use the Error List window to view errors
 //   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
 //   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+
 
