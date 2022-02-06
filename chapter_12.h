@@ -212,5 +212,24 @@ namespace chapter_12
 			};
 		}
 	}
+	// !!!! DO NOT PUT ADDITIONAL PARENTHESES AROUND A RETURNED NAME
+	// THIS IS BECAUSE decltype(auto) ALWAYS DEDUCES AN LVALUE REFERENCE
+	namespace sec_12_2_3b
+	{
+		void run()
+		{
+			auto f = [](auto f, auto&&... args) -> decltype(auto)
+			{
+				decltype(auto) ret{ f(std::forward<Args>(args)...) };
+				// ...
+				if constexpr (std::is_rvalue_reference_v<decltype(ret)>) {
+					return std::move(ret);	// move xvalue returned by f() to caller
+				}
+				else {
+					return (ret);				// FATAL RUNTIME ERROR: always returns an lvalue reference
+				}
+			};
+		}
+	}
 
 }
