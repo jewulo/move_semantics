@@ -148,7 +148,7 @@ namespace chapter_14
 	// Move Iterators
 	namespace sec_14_3
 	{
-		// You can only access an elemnt once using move iterators
+		// You can only access an element once using move iterators
 	}
 
 	// Move Iterators in Algorithms
