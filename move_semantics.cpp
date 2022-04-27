@@ -243,7 +243,9 @@ void chapter_14_run()
 }
 
 void chapter_15_run()
-{}
+{
+    chapter_15::sec_15_1::run();
+}
 
 int main()
 {
@@ -253,14 +255,14 @@ int main()
     //chapter_4_run();
     //chapter_5_run();
     //chapter_6_run();
-    chapter_7_run();
-    chapter_8_run();
-    chapter_9_run();
-    chapter_10_run();
-    chapter_11_run();
-    chapter_12_run();
-    chapter_13_run();
-    chapter_14_run();
+    //chapter_7_run();
+    //chapter_8_run();
+    //chapter_9_run();
+    //chapter_10_run();
+    //chapter_11_run();
+    //chapter_12_run();
+    //chapter_13_run();
+    //chapter_14_run();
     chapter_15_run();
 
     cin.get();
